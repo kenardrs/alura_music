@@ -1,15 +1,31 @@
 package br.com.alura.spring.desafio.alura_music.alura_music.main;
 
+import br.com.alura.spring.desafio.alura_music.alura_music.entities.Artista;
+import br.com.alura.spring.desafio.alura_music.alura_music.entities.Musica;
+import br.com.alura.spring.desafio.alura_music.alura_music.entities.TipoArtista;
+import br.com.alura.spring.desafio.alura_music.alura_music.services.ArtistaService;
+import br.com.alura.spring.desafio.alura_music.alura_music.services.MusicaService;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class Principal {
 
+    private final ArtistaService artistaService;
+
+    private final MusicaService musicaService;
+
+    public Principal(ArtistaService artistaService, MusicaService musicaService) {
+        this.artistaService = artistaService;
+        this.musicaService = musicaService;
+    }
+
     private final Scanner leitura = new Scanner(System.in);
 
     public void exibeMenu(){
-        var Opcao = -1;
-        while (Opcao != 9) {
-            System.out.println("""
+        var opcao = -1;
+        while (opcao != 9) {
+            var menu="""
                     Escolha uma opção do menu:
                     1- Cadastrar artistas
                     2- Cadastrar músicas
@@ -17,10 +33,12 @@ public class Principal {
                     4- Buscar músicas por artistas
                     5- Pesquisar dados sobre um artista
                     9- Sair
-                    """);
-            Opcao = leitura.nextInt();
+                    """;
+            System.out.println(menu);
+            opcao = leitura.nextInt();
+            leitura.nextLine();
 
-            switch (Opcao){
+            switch (opcao){
                 case 1:
                     cadastrarArtista();
                     break;
@@ -47,22 +65,61 @@ public class Principal {
     }
 
     private void cadastrarArtista() {
-        System.out.println("Cadastrar artista");
+        System.out.println("Informe o nome do Artista:");
+        var nome = leitura.nextLine();
+        System.out.println("Escolha o tipo do Artista (SOLO, DUPLA, BANDA):");
+        var tipo = leitura.nextLine().toUpperCase();
+
+        Artista artista = new Artista();
+        artista.setNome(nome);
+        artista.setTipo(TipoArtista.valueOf(tipo));
+        artistaService.salvarArtista(artista);
+        System.out.println("Artista salvo com sucesso!");
     }
 
     private void cadastrarMusica() {
-        System.out.println("Cadastrar musica");
+        System.out.println("Informe o título da Música");
+        var titulo = leitura.nextLine();
+        System.out.println("Informe o código de um dos artistas:");
+        listarArtistas();
+        var artistaId = leitura.nextLong();
+        leitura.nextLine(); // buffer clean
+        Musica musica = new Musica();
+        musica.setTitulo(titulo);
+        musicaService.salvarMusica(musica, artistaId);
+        System.out.println("Música cadastrada com sucesso!");
+
+
     }
 
     private void listarMusicas() {
-        System.out.println("Listar musicas");
+        var musicas = musicaService.listarMusicas();
+        musicas.forEach(System.out::println);
     }
 
     private void buscarMusicasPorArtista() {
-        System.out.println("Buscar musicas por artista");
+        listarArtistas();
+        System.out.println("Informe o código do artista:");
+        Long artistaId = leitura.nextLong();
+        leitura.nextLine(); // clear buffer
+        List<Musica> musicas = musicaService.listarMusicasPorArtista(artistaId);
+        if (musicas.isEmpty()){
+            System.out.println("O artista não possui músicas");
+        } else {
+            musicas.forEach(System.out::println);
+        }
     }
 
     private void pesquisarDadosSobreUmArtista() {
 
+    }
+
+    private void listarArtistas() {
+        List<Artista> artistas = artistaService.listarArtistas();
+        if (artistas.isEmpty()) {
+            System.out.println("Não tem artista na base ainda!");
+        } else {
+            artistas.forEach(System.out::println);
+        }
     }
 }

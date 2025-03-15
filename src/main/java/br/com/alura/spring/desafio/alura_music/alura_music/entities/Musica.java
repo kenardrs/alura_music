@@ -1,17 +1,11 @@
 package br.com.alura.spring.desafio.alura_music.alura_music.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 @Entity
 @Table(name = "musica")
-@Getter
-@Setter
-@RequiredArgsConstructor
-@ToString
+@Data
 public class Musica {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +14,7 @@ public class Musica {
     private String titulo;
 
     @ManyToOne
+    @JoinColumn(name = "artista_id")
     private Artista artista;
 
 }

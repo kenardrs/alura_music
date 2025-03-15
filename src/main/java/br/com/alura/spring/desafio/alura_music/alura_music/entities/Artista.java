@@ -1,18 +1,14 @@
 package br.com.alura.spring.desafio.alura_music.alura_music.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "artista")
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
 public class Artista {
 
     @Id
@@ -22,16 +18,11 @@ public class Artista {
     @Column(unique = true)
     private String nome;
 
+    @Enumerated(EnumType.STRING)
     private TipoArtista tipo;
 
-    @OneToMany(mappedBy = "artista")
-    private List<Musica> musicas = new ArrayList<>();
+    @OneToMany(mappedBy = "artista", fetch = FetchType.EAGER)
+    @ToString.Exclude // evita estouro de pilha
+    private List<Musica> musicas;
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "nome = " + nome + ", " +
-                "tipo = " + tipo + ")";
-    }
 }
